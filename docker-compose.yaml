@@ -1,0 +1,11 @@
+version: "3.9"
+
+services:
+  data_generator:
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+    container_name: data_generator
+    restart: always
+    ports:
+      - "8083:8082"
