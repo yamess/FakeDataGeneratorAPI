@@ -12,7 +12,7 @@ logger = logging.getLogger(__name__)
 app = FastAPI(
     title="Rest API for fake data generation",
     version=VERSION,
-    docs_url="/"
+    docs_url="/docs"
 )
 
 app.include_router(router=routes.route, prefix=("/" + VERSION), tags=["PersonData"])

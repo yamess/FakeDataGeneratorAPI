@@ -1,0 +1,44 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: my-generator
+  name: my-generator
+  namespace: default
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: my-generator
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: my-generator
+    spec:
+      containers:
+        - image: data-generator:1.0.2
+          name: my-generator
+          imagePullPolicy: Never
+          ports:
+            - containerPort: 8082
+          resources: { }
+      restartPolicy: Always
+      volumes:
+        - name: data-generator
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: my-generator
+  name: my-generator
+  namespace: default
+spec:
+  ports:
+    - name: http
+      port: 8083
+      targetPort: 8082
+  selector:
+    app: data-generator
