@@ -84,9 +84,9 @@ spec:
     - name: "data-generator-route"
       match:
         - uri:
-            prefix: "/"
-      #      rewrite:
-      #        uri: " "
+            prefix: "/gen"
+      rewrite:
+        uri: " "
       route:
         - destination:
             host: data-generator.jarvis.svc.cluster.local
