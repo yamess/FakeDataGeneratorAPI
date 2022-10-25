@@ -18,7 +18,7 @@ spec:
         app: data-generator
     spec:
       containers:
-        - image: data-generator:1.0.2
+        - image: data-generator:1.0.0
           name: data-generator
           imagePullPolicy: Never
           ports:
@@ -42,51 +42,8 @@ spec:
       targetPort: 8082
   selector:
     app: data-generator
-status:
-  loadBalancer: { }
----
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  labels:
-    app: easy-web
-  name: easy-web
-  namespace: jarvis
-spec:
-  replicas: 1
-  selector:
-    matchLabels:
-      app: easy-web
-  strategy:
-    type: Recreate
-  template:
-    metadata:
-      labels:
-        app: easy-web
-    spec:
-      containers:
-        - image: yeasy/simple-web
-          name: easy-web
-          imagePullPolicy: IfNotPresent
-          ports:
-            - containerPort: 80
-          resources: { }
-      restartPolicy: Always
----
-apiVersion: v1
-kind: Service
-metadata:
-  labels:
-    app: easy-web
-  name: easy-web
-  namespace: jarvis
-spec:
-  ports:
-    - name: http
-      port: 80
-      targetPort: 80
-  selector:
-    app: easy-web
+#status:
+#  loadBalancer: { }
 ---
 apiVersion: networking.istio.io/v1alpha3
 kind: Gateway
@@ -115,24 +72,6 @@ spec:
   gateways:
     - jarvis-gateway
   http:
-    - name: "data-generator-route"
-      match:
-        - uri:
-            prefix: "/generator"
-      route:
-        - destination:
-            host: data-generator.jarvis.svc.cluster.local
-            port:
-              number: 8082
-    - name: "easy-web-route"
-      match:
-        - uri:
-            prefix: "/web"
-      route:
-        - destination:
-            host: easy-web.jarvis.svc.cluster.local
-            port:
-              number: 80
     - name: "kiali-route"
       match:
         - uri:
@@ -142,3 +81,14 @@ spec:
             host: kiali.istio-system.svc.cluster.local
             port:
               number: 20001
+    - name: "data-generator-route"
+      match:
+        - uri:
+            prefix: "/"
+      #      rewrite:
+      #        uri: " "
+      route:
+        - destination:
+            host: data-generator.jarvis.svc.cluster.local
+            port:
+              number: 8082
