@@ -131,11 +131,12 @@ class GeoPoint(Enum):
 
 
 class Properties(Enum):
-    PERSON = "Person"
-    FULL_PROFILE = "FullProfile"
-    SIMPLE_PROFILE = "SimpleProfile"
-    ADDRESS = "Address"
+    PERSON = "person"
+    FULL_PROFILE = "full_profile"
+    SIMPLE_PROFILE = "simple_profile"
+    ADDRESS = "address"
     BANK = "bank"
     AIRPORT = "airport"
     SCHOOLS = "schools"
     VEHICULE = "vehicule"
+    GEOPOINT = "geo_point"
