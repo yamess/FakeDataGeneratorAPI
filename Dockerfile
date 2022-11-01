@@ -15,8 +15,9 @@ RUN apt-get update -qq && \
 
 RUN pip install --upgrade pip setuptools
 
-RUN pip install -r ./requirements.txt
+RUN pip install --no-cache-dir --upgrade -r ./requirements.txt
 
 COPY ./src /app
 
-CMD ["sh","-c","python -m data_generator.main"]
+#CMD ["sh","-c","python -m data_generator.main"]
+CMD ["uvicorn","data_generator.server:app","--host","0.0.0.0","--port","8082", "--workers", "1", "--root-path","/gen"]

@@ -1,0 +1,94 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: data-generator
+  name: data-generator
+  namespace: jarvis
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: data-generator
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: data-generator
+    spec:
+      containers:
+        - image: data-generator:1.0.0
+          name: data-generator
+          imagePullPolicy: Never
+          ports:
+            - containerPort: 8082
+          resources: { }
+      restartPolicy: Always
+      volumes:
+        - name: data-generator
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: data-generator
+  name: data-generator
+  namespace: jarvis
+spec:
+  ports:
+    - name: http
+      port: 8082
+      targetPort: 8082
+  selector:
+    app: data-generator
+#status:
+#  loadBalancer: { }
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: Gateway
+metadata:
+  name: jarvis-gateway
+  namespace: jarvis
+spec:
+  selector:
+    istio: ingressgateway
+  servers:
+    - port:
+        number: 80
+        name: http
+        protocol: HTTP
+      hosts:
+        - "*"
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  name: jarvis-virtual-service
+  namespace: jarvis
+spec:
+  hosts:
+    - "*"
+  gateways:
+    - jarvis-gateway
+  http:
+    - name: "kiali-route"
+      match:
+        - uri:
+            prefix: "/kiali"
+      route:
+        - destination:
+            host: kiali.istio-system.svc.cluster.local
+            port:
+              number: 20001
+    - name: "data-generator-route"
+      match:
+        - uri:
+            prefix: "/gen"
+      rewrite:
+        uri: " "
+      route:
+        - destination:
+            host: data-generator.jarvis.svc.cluster.local
+            port:
+              number: 8082
